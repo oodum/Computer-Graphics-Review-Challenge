@@ -8,6 +8,7 @@ using UnityEngine.Serialization;
 [SelectionBase]
 public class PlayerController : MonoBehaviour {
     static readonly int TINT = Shader.PropertyToID("_Tint");
+    static readonly int COLOR_TINT = Shader.PropertyToID("_ColorTint");
     [SerializeField] HealthComponent healthComponent;
 
     [SerializeField] float dodgeTime;
@@ -15,7 +16,7 @@ public class PlayerController : MonoBehaviour {
 
     [SerializeField] MeshRenderer renderer;
 
-    [SerializeField] Shader normalShader, negativeShader;
+    [SerializeField] Material normalShader, negativeShader;
 
     bool isDodging;
 
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour {
 
     void Awake() {
         initialPos = transform.position;
+        healthComponent.Health = 3;
     }
 
     void OnEnable() {
@@ -40,16 +42,21 @@ public class PlayerController : MonoBehaviour {
     void TakeDamage() {
         if (--healthComponent.Health <= 0) {
             GameManager.Instance.EndGame();
+            renderer.material = normalShader;
+            renderer.material.SetColor(COLOR_TINT, Color.red);
         }
     }
 
     void Update() {
+        if (healthComponent.Health <= 0) return;
         if (Keyboard.current.aKey.wasPressedThisFrame) {
             DodgeLeft();
         } else if (Keyboard.current.dKey.wasPressedThisFrame) {
             DodgeRight();
         } else if (Keyboard.current.spaceKey.wasPressedThisFrame) {
             Block();
+        } else if (Mouse.current.leftButton.wasPressedThisFrame) {
+            Attack();
         }
     }
 
@@ -82,16 +89,17 @@ public class PlayerController : MonoBehaviour {
     }
 
     void SetNegative() {
-        renderer.material.shader = negativeShader;
+        renderer.material = negativeShader;
     }
 
     void UnsetNegative() {
-        renderer.material.shader = normalShader;
+        renderer.material = normalShader;
     }
 
+
     async void Attack() {
-        renderer.material.SetFloat(TINT, 1);
+        renderer.material.SetColor(COLOR_TINT, Color.blue);
         await Task.Delay(100);
-        renderer.material.SetFloat(TINT, 0);
+        renderer.material.SetColor(COLOR_TINT, Color.white);
     }
 }
