@@ -1,6 +1,13 @@
 # Computer Graphics Review Challenge
 ## Adam Tam (100868600) & Sidharth Suresh (100938544)
 
+# How to play
+A or D to dodge, and space to block
+
+The enemy will take a step forward right before it attacks. Make sure to dodge properly!
+
+When you die, you will turn red.
+
 We made use of two different shaders
 
 - Combined shader with both **Toon Shader** with **Outline Shader**
@@ -74,4 +81,52 @@ tint_color = (1, 0, 1) # RGB values
 tint_strength = 0.5
 
 tinted_inverted_color = inverted_color + (tint_color * tint_strength)
+```
+
+# Game Implementation (Adam)
+In order to get the shader to be in the game, this is how we did it
+When the player dodges, it sets the shader to the negative shader and then after a delay, it unsets the shader back to the normal shader.
+```csharp
+
+    async void DodgeLeft() {
+        isDodging = true;
+        transform.position = initialPos - transform.right;
+        SetNegative();
+        await Task.Delay((int)(dodgeTime * 1000));
+        UnsetNegative();
+        transform.position = initialPos;
+        isDodging = false;
+    }
+    
+    void SetNegative() {
+        renderer.material = negativeShader;
+    }
+
+    void UnsetNegative() {
+        renderer.material = normalShader;
+    }
+```
+
+When the player attacks, it sets the main color's tint to blue:
+```csharp
+    async void Attack() {
+        renderer.material.SetColor(COLOR_TINT, Color.blue);
+        await Task.Delay(100);
+        renderer.material.SetColor(COLOR_TINT, Color.white);
+    }
+```
+
+When the player takes damage, it's going to check if the health is <= 0. If it is, it'll set the color to red, and the player cannot move anymore:
+```csharp
+    void OnAttack() {
+        if (isDodging) return;
+        TakeDamage();
+    }
+    void TakeDamage() {
+        if (--healthComponent.Health <= 0) {
+            GameManager.Instance.EndGame();
+            renderer.material = normalShader;
+            renderer.material.SetColor(COLOR_TINT, Color.red);
+        }
+    }
 ```
