@@ -130,3 +130,7 @@ When the player takes damage, it's going to check if the health is <= 0. If it i
         }
     }
 ```
+
+# Contributions
+Adam: Gameplay + Shader integration (50%)
+Sid: Toon Shader w/ Outline + Negative Shader (50%)
