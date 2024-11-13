@@ -6,6 +6,8 @@ A or D to dodge, and space to block
 
 The enemy will take a step forward right before it attacks. Make sure to dodge properly!
 
+You can press the left mouse button to attack
+
 When you die, you will turn red.
 
 We made use of two different shaders
